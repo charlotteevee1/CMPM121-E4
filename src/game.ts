@@ -3,19 +3,18 @@ import {
   type Actor,
   type Arena,
   Bullet,
-  HEIGHT,
-  Player,
-  WIDTH,
-} from "./actors.ts";
-import {
   dartData,
   droneData,
+  HEIGHT,
   lancerData,
+  Player,
   ShmupBoss,
+  ShmupEnemy,
   ShmupPowerUp,
-  ShmupPrefabSprite,
   turretData,
-} from "./prefab.ts";
+  WIDTH,
+} from "./actors.ts";
+
 import type { Hud } from "./hud.ts";
 import type { LaunchOptions } from "./main.ts";
 import { AutoPilot, KeyboardPilot, type Pilot } from "./pilots.ts";
@@ -54,7 +53,7 @@ export class GameScene extends Phaser.Scene implements Arena {
   private run;
   private pilot!: Pilot;
   private backdrop!: Backdrop;
-  private enemies: ShmupPrefabSprite[] = [];
+  private enemies: ShmupEnemy[] = [];
   private shots: Bullet[] = [];
   private bullets: Bullet[] = [];
   private pickups: ShmupPowerUp[] = [];
@@ -328,7 +327,7 @@ export class GameScene extends Phaser.Scene implements Arena {
 
   summon(_kind: string, x: number, y: number): void {
     this.enemies.push(
-      new ShmupPrefabSprite(
+      new ShmupEnemy(
         droneData,
         this,
         x,
@@ -475,7 +474,7 @@ export class GameScene extends Phaser.Scene implements Arena {
           }
         }
         if (t === timingRule) {
-          const enemy = new ShmupPrefabSprite(
+          const enemy = new ShmupEnemy(
             enemyData,
             this,
             x,
@@ -539,7 +538,7 @@ export class GameScene extends Phaser.Scene implements Arena {
     }
   }
 
-  private destroyEnemy(enemy: ShmupPrefabSprite): void {
+  private destroyEnemy(enemy: ShmupEnemy): void {
     enemy.setActive(false);
     this.run.score += enemy.score;
     this.run.kills++;
@@ -558,7 +557,7 @@ export class GameScene extends Phaser.Scene implements Arena {
 
   private hurtPlayer(): void {
     // After the Warden falls, nothing can hurt the ship during the victory lap.
-    if (this.run.bossDefeted || this.gameOver || !this.player.vulnerable) {
+    if (this.run.bossDefeated || this.gameOver || !this.player.vulnerable) {
       return;
     }
     this.run.hits++;
@@ -596,7 +595,7 @@ export class GameScene extends Phaser.Scene implements Arena {
     this.victoryAt = this.now + VICTORY_TICKS;
     this.hud.setBoss(0);
     this.hud.announce("WARDEN DOWN", "The lanes are open");
-    console.log("victory lap: ship protected =", this.run.bossDefeted);
+    console.log("victory lap: ship protected =", this.run.bossDefeated);
     // The Warden's fall takes its bullets and escorts with it (no score).
     for (const bullet of this.bullets) {
       this.burst(bullet.x, bullet.y, 2, TINTS.spark);
