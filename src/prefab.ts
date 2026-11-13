@@ -5,6 +5,75 @@ function aim(from: { x: number; y: number }, arena: Arena): number {
   return Math.atan2(arena.player.y - from.y, arena.player.x - from.x);
 }
 
+type SpriteData = {
+  kind?: string;
+  hp: number;
+  score: number;
+  radius: number;
+  dropChance: number;
+  canShoot: boolean;
+  isPickup: boolean;
+};
+
+export const droneData: SpriteData = {
+  kind: "drone",
+  hp: 2,
+  score: 100,
+  radius: 13,
+  dropChance: 0.015,
+  canShoot: true,
+  isPickup: false,
+};
+
+export const dartData: SpriteData = {
+  kind: "dart",
+  hp: 1,
+  score: 150,
+  radius: 12,
+  dropChance: 0.015,
+  canShoot: false,
+  isPickup: false,
+};
+
+export const turretData: SpriteData = {
+  kind: "turret",
+  hp: 12,
+  score: 400,
+  radius: 19,
+  dropChance: 0.3,
+  canShoot: true,
+  isPickup: false,
+};
+
+export const lancerData: SpriteData = {
+  kind: "lancer",
+  hp: 4,
+  score: 250,
+  radius: 15,
+  dropChance: 0.06,
+  canShoot: true,
+  isPickup: false,
+};
+
+const bossData: SpriteData = {
+  kind: "boss",
+  hp: 900,
+  score: 10000,
+  radius: 46,
+  dropChance: 0,
+  canShoot: true,
+  isPickup: false,
+};
+
+const powerUpData: SpriteData = {
+  hp: 0,
+  score: 0,
+  radius: 14,
+  dropChance: 0,
+  canShoot: false,
+  isPickup: true,
+};
+
 /**
  * Base class for everything the player can shoot or pick up: enemies, the
  * boss and power-ups. kind is the prefab's name and also its texture key.
@@ -16,22 +85,30 @@ export class ShmupPrefabSprite extends Actor {
   // spin: turrets rotate using this
   spin = 0;
 
+  kind: string;
+  hp: number;
+  score: number;
+  dropChance: number;
+  canShoot: boolean;
+  isPickup: boolean;
+
   constructor(
+    spriteData: SpriteData,
     scene: Phaser.Scene,
     x: number,
     y: number,
-    public kind: string,
-    public hp: number,
-    public score: number,
-    radius: number,
-    public dropChance: number,
-    public canShoot: boolean,
-    public isPickup: boolean,
     public homeX: number,
     public side: number,
   ) {
-    super(scene, x, y, kind, radius);
-    this.maxHp = hp;
+    super(scene, x, y, spriteData.kind, spriteData.radius);
+    this.maxHp = spriteData.hp;
+
+    this.kind = spriteData.kind;
+    this.hp = spriteData.hp;
+    this.score = spriteData.score;
+    this.dropChance = spriteData.dropChance;
+    this.canShoot = spriteData.canShoot;
+    this.isPickup = spriteData.isPickup;
   }
 
   step(arena: Arena): void {
@@ -122,16 +199,10 @@ export class ShmupBoss extends ShmupPrefabSprite {
 
   constructor(scene: Phaser.Scene) {
     super(
+      bossData,
       scene,
       WIDTH / 2,
       -90,
-      "boss",
-      900,
-      10000,
-      46,
-      0,
-      true,
-      false,
       WIDTH / 2,
       1,
     );
@@ -208,8 +279,10 @@ export class ShmupBoss extends ShmupPrefabSprite {
 }
 
 export class ShmupPowerUp extends ShmupPrefabSprite {
-  constructor(scene: Phaser.Scene, x: number, y: number, kind) {
-    super(scene, x, y, kind, 0, 0, 14, 0, false, true, x, 1);
+  constructor(scene: Phaser.Scene, x: number, y: number, kind: string) {
+    super(powerUpData, scene, x, y, x, 1);
+    this.kind = kind;
+    this.setTexture(kind);
   }
 
   override step(): void {
