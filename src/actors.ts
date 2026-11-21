@@ -119,6 +119,13 @@ function lancerFire(arena: Arena): void {
   }
 }
 
+export const enemyDataKinds = {
+  drone: droneData,
+  dart: dartData,
+  turret: turretData,
+  lancer: lancerData,
+};
+
 const bossData: SpriteData = {
   kind: "boss",
   hp: 900,
