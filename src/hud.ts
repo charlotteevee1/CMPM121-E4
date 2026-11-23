@@ -40,9 +40,9 @@ export class Hud {
     ) as HTMLTemplateElement;
     this.stops = names.map((name) => {
       const firstStop = template.content.firstElementChild;
-      const stop = firstStop.cloneNode(true) as HTMLElement;
+      const stop = firstStop!.cloneNode(true) as HTMLElement;
 
-      stop.querySelector(".stop-name").textContent = name;
+      stop.querySelector(".stop-name")!.textContent = name;
       this.route.appendChild(stop);
       return stop;
     });

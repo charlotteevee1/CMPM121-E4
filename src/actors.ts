@@ -20,15 +20,28 @@ export interface Arena {
   summon(kind: string, x: number, y: number): void;
 }
 
-type SpriteData = {
-  kind: string;
+interface SpriteData {
+  kind: "drone" | "dart" | "turret" | "lancer" | "boss";
   hp: number;
   score: number;
   radius: number;
   dropChance: number;
   movement?: (arena: Arena) => void;
   fire?: (arena: Arena) => void;
-};
+}
+
+export interface Run {
+  score: number;
+  lives: number;
+  kills: number;
+  hits: number;
+  continues: number;
+  bossDefeated?: boolean;
+}
+
+export type Control =
+  | "auto"
+  | "play";
 
 function aim(from: { x: number; y: number }, arena: Arena): number {
   return Math.atan2(arena.player.y - from.y, arena.player.x - from.x);
@@ -44,11 +57,11 @@ export const droneData: SpriteData = {
   fire: droneFire,
 };
 
-function droneMove(): void {
+function droneMove(this: ShmupEnemy): void {
   this.y += 1.5;
   this.x = this.homeX + Math.sin(this.age * 0.045) * 46 * this.side;
 }
-function droneFire(arena: Arena): void {
+function droneFire(this: ShmupEnemy, arena: Arena): void {
   if (this.age % 100 !== 60 || !arena.rng.chance(0.35)) return;
   arena.fire(this.x, this.y, aim(this, arena), 2.4);
 }
@@ -63,7 +76,7 @@ export const dartData: SpriteData = {
 };
 
 // Drift in slowly, then commit to a dive toward where the player was.
-function dartMove(arena: Arena): void {
+function dartMove(this: ShmupEnemy, arena: Arena): void {
   if (this.age < 50) {
     this.y += 1.2;
   } else {
@@ -85,13 +98,13 @@ export const turretData: SpriteData = {
   fire: turretFire,
 };
 
-function turretMove(): void {
+function turretMove(this: ShmupEnemy): void {
   if (this.age < 70) this.y += 1.6;
   else if (this.age > 420) this.y += 1.2;
   this.rotation += 0.02;
 }
 
-function turretFire(arena: Arena): void {
+function turretFire(this: ShmupEnemy, arena: Arena): void {
   const t = this.age - 80;
   if (t < 0 || this.age > 420 || t % 100 > 40 || t % 8 !== 0) return;
   arena.fire(this.x, this.y, aim(this, arena), 3.4);
@@ -107,12 +120,12 @@ export const lancerData: SpriteData = {
   fire: lancerFire,
 };
 
-function lancerMove(): void {
+function lancerMove(this: ShmupEnemy): void {
   this.x += 2.4 * this.side;
   this.y += 0.35;
 }
 
-function lancerFire(arena: Arena): void {
+function lancerFire(this: ShmupEnemy, arena: Arena): void {
   if (this.age % 40 !== 20 || this.x < 20 || this.x > WIDTH - 20) return;
   for (const spread of [-0.25, 0, 0.25]) {
     arena.fire(this.x, this.y + 8, Math.PI / 2 + spread, 2.6);

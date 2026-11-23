@@ -3,9 +3,11 @@ import {
   type Actor,
   type Arena,
   Bullet,
+  Control,
   droneData,
   enemyDataKinds,
   Player,
+  Run,
   ShmupBoss,
   ShmupEnemy,
   ShmupPowerUp,
@@ -44,10 +46,10 @@ export class PlayScene extends Phaser.Scene implements Arena {
   private gameOver = false;
   private carry = 0;
   private sparks!: Phaser.GameObjects.Particles.ParticleEmitter;
-  private run;
+  private run!: Run;
   private backdrop!: Backdrop;
   leaving = false;
-  private control;
+  private control!: Control;
 
   constructor(
     private readonly hud: Hud,
@@ -56,7 +58,7 @@ export class PlayScene extends Phaser.Scene implements Arena {
     super("play");
   }
 
-  init(data: { control?: string }): void {
+  init(data: { control: Control }): void {
     this.control = data.control;
     this.leaving = false;
 

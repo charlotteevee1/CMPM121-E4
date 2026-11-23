@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { HEIGHT, WIDTH } from "../actors.ts";
+import { Control, HEIGHT, Run, WIDTH } from "../actors.ts";
 
 import type { Hud } from "../hud.ts";
 import { play } from "../sounds.ts";
@@ -18,10 +18,10 @@ const CREDITS_AT = 11;
 const RETURN_AT = 18;
 
 export class CutsceneScene extends Phaser.Scene {
-  private run;
+  private run!: Run;
   private backdrop!: Backdrop;
   leaving = false;
-  private control;
+  private control!: Control;
 
   constructor(
     private readonly hud: Hud,
@@ -29,7 +29,7 @@ export class CutsceneScene extends Phaser.Scene {
     super("cutscene");
   }
 
-  init(data: { run: object; control: string }) {
+  init(data: { run: Run; control: Control }) {
     this.leaving = false;
     this.run = data.run;
     this.control = data.control;

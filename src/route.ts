@@ -1,17 +1,17 @@
-export type Wave = {
+export interface Wave {
   time: number;
   kind: "drone" | "dart" | "turret" | "lancer";
   count: number;
   position: number;
   formation: "line" | "vee" | "column" | "pincer";
-};
+}
 
-export type Sector = {
+export interface Sector {
   name: string;
   subtitle: string;
   length: number;
   waves: Wave[];
-};
+}
 
 export const sectors: Sector[] = [
   {
